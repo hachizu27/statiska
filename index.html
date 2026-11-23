@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dasbor Interaktif: Prediksi Suhu & Karhutla Indonesia 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js untuk Grafik Interaktif -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            950: '#070d19',
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Kustomisasi Scrollbar & Efek Glassmorphism */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.72);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .tab-active {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+        }
+        input[type="range"] {
+            accent-color: #f97316;
+        }
+    </style>
+</head>
+<body class="bg-navy-950 text-slate-100 font-sans antialiased selection:bg-orange-500 selection:text-white min-h-screen flex flex-col">
+
+    <!-- Navbar / Header Presentasi -->
+    <header class="sticky top-0 z-40 glass-card border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 text-white shadow-lg shadow-orange-500/20">
+                    <i data-lucide="flame" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                            Presentasi Statistika • D-IV TRPL UGM
+                        </span>
+                    </div>
+                    <h1 class="text-base sm:text-lg font-bold text-white leading-tight mt-0.5">
+                        Prediksi Peningkatan Suhu Tahun 2026 Akibat Karhutla di Indonesia
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Navigasi Tab Interaktif -->
+            <nav class="flex flex-wrap items-center gap-1.5 bg-navy-900/90 p-1.5 rounded-xl border border-slate-800" aria-label="Menu Presentasi">
+                <button onclick="switchTab('overview')" id="btn-overview" class="tab-btn tab-active px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    <span>Ringkasan 2026</span>
+                </button>
+                <button onclick="switchTab('regresi')" id="btn-regresi" class="tab-btn text-slate-300 hover:text-white hover:bg-slate-800/70 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="trending-up" class="w-4 h-4"></i>
+                    <span>Model Regresi</span>
+                </button>
+                <button onclick="switchTab('provinsi')" id="btn-provinsi" class="tab-btn text-slate-300 hover:text-white hover:bg-slate-800/70 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                    <span>Data Karhutla Provinsi</span>
+                </button>
+                <button onclick="switchTab('simulator')" id="btn-simulator" class="tab-btn text-slate-300 hover:text-white hover:bg-slate-800/70 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="sliders" class="w-4 h-4"></i>
+                    <span>Simulator Prediksi</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Konten Utama -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- KPI Banner (Selalu Tampil sebagai Jangkar Presentasi) -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- KPI 1 -->
+            <div class="glass-card rounded-2xl p-5 border-l-4 border-emerald-500 hover:translate-y-[-2px] transition-transform">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Prediksi Berbasis Karhutla</p>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-emerald-400 mt-1">+1,2673 °C</h2>
+                    </div>
+                    <div class="p-2 rounded-xl bg-emerald-500/15 text-emerald-400">
+                        <i data-lucide="flame" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-300 mt-3 leading-relaxed">
+                    Regresi berganda (Tahun + Luas Karhutla <span class="font-semibold text-white">202.010,96 Ha</span>), <span class="text-emerald-400 font-medium">R² = 0,3189</span>.
+                </p>
+            </div>
+
+            <!-- KPI 2 -->
+            <div class="glass-card rounded-2xl p-5 border-l-4 border-orange-500 hover:translate-y-[-2px] transition-transform">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Prediksi Tren Historis</p>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-orange-400 mt-1">+1,0453 °C</h2>
+                    </div>
+                    <div class="p-2 rounded-xl bg-orange-500/15 text-orange-400">
+                        <i data-lucide="line-chart" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-300 mt-3 leading-relaxed">
+                    Proyeksi 60 tahun (1965–2025) dengan laju pemanasan <span class="font-semibold text-white">+0,0201 °C/thn</span> (<span class="text-orange-400 font-medium">R² = 0,8452</span>).
+                </p>
+            </div>
+
+            <!-- KPI 3 -->
+            <div class="glass-card rounded-2xl p-5 border-l-4 border-sky-500 hover:translate-y-[-2px] transition-transform">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Observasi Riil BMKG 2026</p>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-sky-400 mt-1">+1,0250 °C</h2>
+                    </div>
+                    <div class="p-2 rounded-xl bg-sky-500/15 text-sky-400">
+                        <i data-lucide="thermometer-sun" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-300 mt-3 leading-relaxed">
+                    Rata-rata Jan–Okt 2026 (<span class="font-semibold text-white">27,225 °C</span> vs baseline 26,20 °C). Error hanya <span class="text-sky-400 font-medium">0,0203 °C</span>.
+                </p>
+            </div>
+
+            <!-- KPI 4 -->
+            <div class="glass-card rounded-2xl p-5 border-l-4 border-rose-500 hover:translate-y-[-2px] transition-transform">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Karhutla 2026</p>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-rose-400 mt-1">202.011 Ha</h2>
+                    </div>
+                    <div class="p-2 rounded-xl bg-rose-500/15 text-rose-400">
+                        <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-300 mt-3 leading-relaxed">
+                    Lonjakan <span class="font-semibold text-white">16,5x lipat</span> dibanding 2025 (12.226,72 Ha). Tertinggi: Kalbar & Papua Selatan.
+                </p>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 1: RINGKASAN & EKSPLORASI DATA ==================== -->
+        <section id="tab-overview" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Grafik 1: Tren Historis 1965-2025 -->
+                <div class="lg:col-span-7 glass-card rounded-2xl p-5 sm:p-6 flex flex-col">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="text-base sm:text-lg font-bold text-white">1. Tren Anomali Suhu Historis (1965–2025)</h3>
+                            <p class="text-xs text-slate-400">Sumber: FAO / Statizoid (61 tahun pengamatan)</p>
+                        </div>
+                        <div class="flex items-center gap-1.5 bg-navy-900 p-1 rounded-xl border border-slate-800 self-start">
+                            <button onclick="updateHistChart('all')" id="hist-all" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-orange-500 text-white cursor-pointer">Semua Tahun (61)</button>
+                            <button onclick="updateHistChart('5yr')" id="hist-5yr" class="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-300 hover:text-white cursor-pointer">Interval 5 Tahun</button>
+                        </div>
+                    </div>
+                    <div class="relative h-72 sm:h-80 w-full">
+                        <canvas id="chartHistoris"></canvas>
+                    </div>
+                    <div class="mt-4 grid grid-cols-3 gap-2 pt-3 border-t border-slate-800 text-center">
+                        <div class="bg-navy-900/70 rounded-xl p-2.5">
+                            <span class="text-[11px] text-slate-400 block">1965–1975 (Fase Dingin)</span>
+                            <span class="text-xs sm:text-sm font-bold text-blue-400">-0,25 °C s/d +0,27 °C</span>
+                        </div>
+                        <div class="bg-navy-900/70 rounded-xl p-2.5">
+                            <span class="text-[11px] text-slate-400 block">1980–2000 (Transisi)</span>
+                            <span class="text-xs sm:text-sm font-bold text-amber-300">+0,14 °C s/d +0,99 °C</span>
+                        </div>
+                        <div class="bg-navy-900/70 rounded-xl p-2.5">
+                            <span class="text-[11px] text-slate-400 block">2005–2025 (Pemanasan Cepat)</span>
+                            <span class="text-xs sm:text-sm font-bold text-rose-400">Puncak +1,42 °C (2024)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grafik 2: Dinamika Suhu Bulanan 2026 -->
+                <div class="lg:col-span-5 glass-card rounded-2xl p-5 sm:p-6 flex flex-col">
+                    <div class="mb-4">
+                        <h3 class="text-base sm:text-lg font-bold text-white">2. Suhu Rata-Rata Bulanan 2026 (BMKG)</h3>
+                        <p class="text-xs text-slate-400">Observasi Jan–Okt & Proyeksi Penutup Tahun Nov–Des</p>
+                    </div>
+                    <div class="relative h-72 sm:h-80 w-full">
+                        <canvas id="chartBulanan2026"></canvas>
+                    </div>
+                    <div class="mt-4 bg-navy-900/80 rounded-xl p-3.5 border border-slate-800 text-xs text-slate-300 space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400">Persamaan Regresi Bulanan:</span>
+                            <span class="font-mono font-semibold text-orange-400">Y = 26,7713 + 0,0825X</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400">Puncak Kemarau & Karhutla (Agt–Okt):</span>
+                            <span class="font-semibold text-rose-400">27,22 °C → 27,65 °C</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400">Proyeksi Nov–Des 2026 (X = 11, 12):</span>
+                            <span class="font-semibold text-emerald-400">27,68 °C – 27,76 °C</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: MODEL REGRESI & PERBANDINGAN ==================== -->
+        <section id="tab-regresi" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Panel Kiri: Regresi Berganda (Tahun + Luas Karhutla) -->
+                <div class="glass-card rounded-2xl p-5 sm:p-6 flex flex-col">
+                    <div class="flex items-start justify-between gap-2 mb-3">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                Model Utama (Berbasis Karhutla)
+                            </span>
+                            <h3 class="text-base sm:text-lg font-bold text-white mt-1.5">
+                                Regresi Linear Berganda (2018–2026)
+                            </h3>
+                        </div>
+                        <span class="text-xs font-mono bg-navy-900 px-2.5 py-1 rounded-lg border border-slate-700 text-emerald-400">
+                            R² = 0,3189
+                        </span>
+                    </div>
+                    <div class="relative h-72 w-full">
+                        <canvas id="chartRegresiBerganda"></canvas>
+                    </div>
+                    <div class="mt-4 bg-navy-900/90 rounded-xl p-4 border border-slate-800 space-y-2 text-xs sm:text-sm">
+                        <p class="font-mono text-emerald-400 font-semibold text-xs sm:text-sm">
+                            Y = -81,1974 + 0,0407X₁ + 0,0000000219X₂
+                        </p>
+                        <ul class="space-y-1.5 text-slate-300 text-xs list-disc pl-4">
+                            <li><strong class="text-white">Variabel Model:</strong> Tahun (X₁) dan Luas Area Terbakar Karhutla (X₂) periode 2018–2025.</li>
+                            <li><strong class="text-white">Kontribusi Positif Karhutla:</strong> Koefisien luas terbakar bernilai positif (+2,19 × 10⁻⁸ °C/Ha), membuktikan eskalasi Karhutla mendorong kenaikan suhu udara.</li>
+                            <li><strong class="text-emerald-400">Prediksi Anomali 2026 (+1,2673 °C):</strong> Dihitung dari luas terbakar <strong>202.010,96 Ha</strong>. Berada <strong>+0,2423 °C</strong> di atas rata-rata observasi Jan–Okt (+1,0250 °C), mengindikasikan potensi kenaikan lanjutan hingga akhir tahun.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Panel Kanan: Regresi Historis 60 Tahun + Validasi Riil -->
+                <div class="glass-card rounded-2xl p-5 sm:p-6 flex flex-col">
+                    <div class="flex items-start justify-between gap-2 mb-3">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                                Model Pembanding & Validasi
+                            </span>
+                            <h3 class="text-base sm:text-lg font-bold text-white mt-1.5">
+                                Regresi Tren Historis (1965–2025) vs. Fakta 2026
+                            </h3>
+                        </div>
+                        <span class="text-xs font-mono bg-navy-900 px-2.5 py-1 rounded-lg border border-slate-700 text-orange-400">
+                            R² = 0,8452
+                        </span>
+                    </div>
+                    <div class="relative h-72 w-full">
+                        <canvas id="chartRegresiHistoris"></canvas>
+                    </div>
+                    <div class="mt-4 bg-navy-900/90 rounded-xl p-4 border border-slate-800 space-y-2 text-xs sm:text-sm">
+                        <p class="font-mono text-orange-400 font-semibold text-xs sm:text-sm">
+                            Y = -39,6888 + 0,0201X
+                        </p>
+                        <ul class="space-y-1.5 text-slate-300 text-xs list-disc pl-4">
+                            <li><strong class="text-white">Prediksi Tren Dasar (X = 2026):</strong> Memproyeksikan anomali dasar suhu tahun 2026 sebesar <strong class="text-orange-400">+1,0453 °C</strong>.</li>
+                            <li><strong class="text-white">Observasi Riil BMKG (Jan–Okt 2026):</strong> Tercatat di angka <strong class="text-sky-400">+1,0250 °C</strong> (rata-rata 27,225 °C terhadap baseline 26,20 °C).</li>
+                            <li><strong class="text-white">Presisi Kalibrasi Sangat Tinggi:</strong> Selisih absolut (<em>error</em>) antara prediksi tren dasar dan fakta lapangan hanya <strong class="text-emerald-400">0,0203 °C (~0,02 °C)</strong>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabel Komparasi 3 Angka Kunci untuk Presentasi -->
+            <div class="glass-card rounded-2xl p-5 sm:p-6">
+                <h3 class="text-base font-bold text-white mb-3 flex items-center gap-2">
+                    <i data-lucide="table" class="w-4 h-4 text-orange-400"></i>
+                    <span>Matriks Perbandingan Hasil Prediksi vs. Observasi Tahun 2026</span>
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-700 text-slate-400 uppercase text-[11px]">
+                                <th class="py-3 px-4">Pendekatan / Sumber Data</th>
+                                <th class="py-3 px-4">Variabel Prediktor (X)</th>
+                                <th class="py-3 px-4">Anomali Suhu 2026</th>
+                                <th class="py-3 px-4">Keterangan & Interpretasi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800 text-slate-200">
+                            <tr class="hover:bg-slate-800/40">
+                                <td class="py-3 px-4 font-semibold text-emerald-400">Regresi Linear Berganda</td>
+                                <td class="py-3 px-4">Tahun (2026) + Luas Karhutla (202.010,96 Ha)</td>
+                                <td class="py-3 px-4 font-extrabold text-emerald-400">+1,2673 °C</td>
+                                <td class="py-3 px-4 text-slate-300">Menunjukkan dorongan pemanasan tambahan (+0,2423 °C) akibat eskalasi Karhutla 2026.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/40">
+                                <td class="py-3 px-4 font-semibold text-orange-400">Regresi Tren Historis (60 Thn)</td>
+                                <td class="py-3 px-4">Tren Waktu Historis (1965–2025)</td>
+                                <td class="py-3 px-4 font-extrabold text-orange-400">+1,0453 °C</td>
+                                <td class="py-3 px-4 text-slate-300">Baseline pemanasan jangka panjang (+0,0201 °C/tahun, R² = 0,8452).</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/40">
+                                <td class="py-3 px-4 font-semibold text-sky-400">Observasi Riil BMKG (Aktual)</td>
+                                <td class="py-3 px-4">Pengamatan 109 Stasiun BMKG (Jan–Okt 2026)</td>
+                                <td class="py-3 px-4 font-extrabold text-sky-400">+1,0250 °C</td>
+                                <td class="py-3 px-4 text-slate-300">Suhu rata-rata 27,225 °C dikalibrasi terhadap acuan 26,20 °C (error hanya 0,0203 °C).</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: DATA KARHUTLA PER PROVINSI ==================== -->
+        <section id="tab-provinsi" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Grafik Top 10 Provinsi 2026 -->
+                <div class="lg:col-span-7 glass-card rounded-2xl p-5 sm:p-6 flex flex-col">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="text-base sm:text-lg font-bold text-white">Top 10 Provinsi Luas Karhutla Terbesar</h3>
+                            <p class="text-xs text-slate-400">Sumber: SIPONGI / Kementerian Kehutanan (dalam Hektare)</p>
+                        </div>
+                        <select id="selectTahunProvinsi" onchange="renderProvinsiChart()" class="bg-navy-900 border border-slate-700 text-white text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-orange-500 cursor-pointer">
+                            <option value="2026" selected>Tahun 2026 (Total: 202.010,96 Ha)</option>
+                            <option value="2025">Tahun 2025 (Total: 12.226,72 Ha)</option>
+                            <option value="2024">Tahun 2024 (Total: 376.805,05 Ha)</option>
+                            <option value="2023">Tahun 2023 (Total: 1.161.192,90 Ha)</option>
+                            <option value="2019">Tahun 2019 (Total: 1.649.258,00 Ha)</option>
+                        </select>
+                    </div>
+                    <div class="relative h-80 w-full">
+                        <canvas id="chartProvinsi"></canvas>
+                    </div>
+                </div>
+
+                <!-- Grafik Total Nasional 2018-2026 -->
+                <div class="lg:col-span-5 glass-card rounded-2xl p-5 sm:p-6 flex flex-col">
+                    <div class="mb-4">
+                        <h3 class="text-base sm:text-lg font-bold text-white">Total Luas Karhutla Nasional (2018–2026)</h3>
+                        <p class="text-xs text-slate-400">Perbandingan akumulasi area terbakar tahunan</p>
+                    </div>
+                    <div class="relative h-64 w-full">
+                        <canvas id="chartNasionalKarhutla"></canvas>
+                    </div>
+                    <div class="mt-4 bg-orange-500/10 border border-orange-500/30 rounded-xl p-3.5 text-xs text-slate-200 leading-relaxed">
+                        <strong class="text-orange-400 block mb-1">Temuan Spasial Tahun 2026:</strong>
+                        Kebakaran tidak hanya terpusat di Kalimantan Barat (<strong>38.310,86 Ha</strong>) dan Riau (<strong>15.738,92 Ha</strong>), tetapi meluas drastis ke wilayah timur seperti <strong>Papua Selatan (25.838,53 Ha)</strong>, <strong>NTT (19.565,16 Ha)</strong>, <strong>NTB (17.406,46 Ha)</strong>, dan <strong>Maluku (14.677,00 Ha)</strong>.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabel Interaktif 38 Provinsi -->
+            <div class="glass-card rounded-2xl p-5 sm:p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h3 class="text-base font-bold text-white">Dataset Lengkap 38 Provinsi (2018–2026)</h3>
+                        <p class="text-xs text-slate-400">Cari nama provinsi untuk melihat perbandingan luas terbakar antar tahun</p>
+                    </div>
+                    <div class="relative w-full sm:w-64">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+                        <input type="text" id="searchProvinsi" oninput="filterTabelProvinsi()" placeholder="Cari provinsi (mis. Papua)..." class="w-full bg-navy-900 border border-slate-700 text-white text-xs rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-orange-500">
+                    </div>
+                </div>
+                <div class="overflow-x-auto max-h-80">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead class="sticky top-0 bg-navy-900 text-slate-400 uppercase text-[11px] border-b border-slate-700">
+                            <tr>
+                                <th class="py-2.5 px-3">Provinsi</th>
+                                <th class="py-2.5 px-3 text-right">2019 (Ha)</th>
+                                <th class="py-2.5 px-3 text-right">2023 (Ha)</th>
+                                <th class="py-3 px-3 text-right">2024 (Ha)</th>
+                                <th class="py-2.5 px-3 text-right">2025 (Ha)</th>
+                                <th class="py-2.5 px-3 text-right text-orange-400 font-bold">2026 (Ha)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyProvinsi" class="divide-y divide-slate-800/80 text-slate-200">
+                            <!-- Diisi via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: SIMULATOR INTERAKTIF REGRESI ==================== -->
+        <section id="tab-simulator" class="tab-content hidden space-y-6">
+            <div class="glass-card rounded-2xl p-5 sm:p-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 pb-4 border-b border-slate-800">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-orange-400">Simulasi Live Presentasi</span>
+                        <h3 class="text-lg sm:text-xl font-bold text-white mt-0.5">Simulator Prediksi Anomali Suhu Berbasis Regresi Berganda</h3>
+                        <p class="text-xs text-slate-400 mt-1">
+                            Geser parameter Tahun (X₁) dan Luas Karhutla Nasional (X₂) untuk mendemonstrasikan cara kerja rumus regresi kepada audiens/dosen.
+                        </p>
+                    </div>
+                    <button onclick="resetSimulator()" class="self-start md:self-auto px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-white flex items-center gap-1.5 transition-colors cursor-pointer">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        <span>Reset ke Data Aktual 2026</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6 items-center">
+                    <!-- Kontrol Slider -->
+                    <div class="lg:col-span-6 space-y-5 bg-navy-900/80 p-5 rounded-2xl border border-slate-800">
+                        <!-- Input Tahun -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label for="simTahun" class="text-xs font-semibold text-slate-300">Variabel X₁: Tahun Proyeksi</label>
+                                <span id="valTahun" class="text-sm font-extrabold text-orange-400 bg-orange-500/15 px-2.5 py-0.5 rounded-lg">2026</span>
+                            </div>
+                            <input type="range" id="simTahun" min="2025" max="2035" step="1" value="2026" oninput="hitungSimulasi()" class="w-full cursor-pointer">
+                            <div class="flex justify-between text-[11px] text-slate-500 mt-1">
+                                <span>2025</span>
+                                <span>2026 (Aktual)</span>
+                                <span>2030</span>
+                                <span>2035</span>
+                            </div>
+                        </div>
+
+                        <!-- Input Luas Karhutla -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label for="simLuas" class="text-xs font-semibold text-slate-300">Variabel X₂: Luas Area Terbakar (Hektare)</label>
+                                <span id="valLuas" class="text-sm font-extrabold text-emerald-400 bg-emerald-500/15 px-2.5 py-0.5 rounded-lg">202.011 Ha</span>
+                            </div>
+                            <input type="range" id="simLuas" min="0" max="2000000" step="1000" value="202011" oninput="hitungSimulasi()" class="w-full cursor-pointer">
+                            <div class="flex justify-between text-[11px] text-slate-500 mt-1">
+                                <span>0 Ha</span>
+                                <span>202.011 Ha (2026)</span>
+                                <span>1.000.000 Ha</span>
+                                <span>2.000.000 Ha</span>
+                            </div>
+                        </div>
+
+                        <!-- Preset Skenario Cepat -->
+                        <div class="pt-2 border-t border-slate-800">
+                            <span class="text-[11px] text-slate-400 block mb-2">Pilih Skenario Cepat:</span>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="setSkenario(2026, 202011)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 cursor-pointer">Aktual 2026 (202 rb Ha)</button>
+                                <button onclick="setSkenario(2026, 12227)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 cursor-pointer">Rendah spt 2025 (12 rb Ha)</button>
+                                <button onclick="setSkenario(2026, 1649258)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 cursor-pointer">Ekstrem spt 2019 (1,65 jt Ha)</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hasil Output Kalkulasi -->
+                    <div class="lg:col-span-6 space-y-4">
+                        <div class="bg-gradient-to-br from-slate-800 to-navy-900 rounded-2xl p-6 border border-slate-700 text-center relative overflow-hidden">
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Hasil Prediksi Anomali Suhu (Y)</p>
+                            <div id="hasilSimulasi" class="text-4xl sm:text-5xl font-extrabold text-emerald-400 my-2">
+                                +1,2673 °C
+                            </div>
+                            <p id="estimasiSuhuMutlak" class="text-xs sm:text-sm text-slate-300">
+                                Setara suhu rata-rata nasional <strong class="text-white">27,47 °C</strong> (di atas baseline 26,20 °C)
+                            </p>
+                        </div>
+
+                        <div class="bg-navy-900/90 rounded-2xl p-4 border border-slate-800 text-xs space-y-2">
+                            <p class="text-slate-400 font-semibold uppercase text-[11px]">Rincian Perhitungan Matematis:</p>
+                            <p id="rumusLive" class="font-mono text-slate-200 bg-navy-950 p-3 rounded-xl border border-slate-800 overflow-x-auto">
+                                Y = -81,1974 + (0,040701 × 2026) + (0,0000000219 × 202011) = +1,2673 °C
+                            </p>
+                            <div class="flex justify-between text-slate-400 pt-1">
+                                <span>Kontribusi Tren Waktu (X₁): <strong id="efekWaktu" class="text-orange-400">+1,2629 °C</strong></span>
+                                <span>Tambahan Efek Karhutla (X₂): <strong id="efekKarhutla" class="text-emerald-400">+0,0044 °C</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 py-4 px-4 text-center text-xs text-slate-500">
+        Dasbor Analisis Statistika • Sumber Data: BMKG (2026), SIPONGI Kementerian Kehutanan (2018–2026), dan FAO/Statizoid (1965–2025).
+    </footer>
+
+    <script>
+        // Inisialisasi ikon Lucide
+        lucide.createIcons();
+
+        // ==================== DATASET AKTUAL DARI FILE PENGGUNA ====================
+        // 1. Data Historis Anomali Suhu 1965-2025 (data.csv)
+        const dataHistoris = [
+            { year: 1965, val: -0.251 }, { year: 1966, val: 0.065 }, { year: 1967, val: -0.131 }, { year: 1968, val: -0.053 },
+            { year: 1969, val: 0.183 }, { year: 1970, val: 0.152 }, { year: 1971, val: -0.168 }, { year: 1972, val: -0.063 },
+            { year: 1973, val: 0.268 }, { year: 1974, val: -0.155 }, { year: 1975, val: -0.127 }, { year: 1976, val: -0.001 },
+            { year: 1977, val: 0.111 }, { year: 1978, val: 0.087 }, { year: 1979, val: 0.198 }, { year: 1980, val: 0.217 },
+            { year: 1981, val: 0.175 }, { year: 1982, val: -0.003 }, { year: 1983, val: 0.422 }, { year: 1984, val: -0.150 },
+            { year: 1985, val: 0.145 }, { year: 1986, val: 0.092 }, { year: 1987, val: 0.464 }, { year: 1988, val: 0.415 },
+            { year: 1989, val: 0.070 }, { year: 1990, val: 0.180 }, { year: 1991, val: 0.312 }, { year: 1992, val: 0.382 },
+            { year: 1993, val: 0.272 }, { year: 1994, val: 0.347 }, { year: 1995, val: 0.399 }, { year: 1996, val: 0.397 },
+            { year: 1997, val: 0.389 }, { year: 1998, val: 0.990 }, { year: 1999, val: 0.278 }, { year: 2000, val: 0.265 },
+            { year: 2001, val: 0.503 }, { year: 2002, val: 0.629 }, { year: 2003, val: 0.645 }, { year: 2004, val: 0.594 },
+            { year: 2005, val: 0.713 }, { year: 2006, val: 0.398 }, { year: 2007, val: 0.449 }, { year: 2008, val: 0.244 },
+            { year: 2009, val: 0.552 }, { year: 2010, val: 0.754 }, { year: 2011, val: 0.300 }, { year: 2012, val: 0.407 },
+            { year: 2013, val: 0.750 }, { year: 2014, val: 0.762 }, { year: 2015, val: 0.780 }, { year: 2016, val: 1.405 },
+            { year: 2017, val: 0.949 }, { year: 2018, val: 0.870 }, { year: 2019, val: 1.033 }, { year: 2020, val: 1.225 },
+            { year: 2021, val: 1.007 }, { year: 2022, val: 0.970 }, { year: 2023, val: 1.093 }, { year: 2024, val: 1.419 },
+            { year: 2025, val: 1.121 }
+        ];
+
+        // 2. Data Suhu Bulanan 2026 (2026.csv)
+        const data2026 = [
+            { bulan: 'Jan', suhu: 26.70, stasiun: 116 },
+            { bulan: 'Feb', suhu: 26.70, stasiun: 118 },
+            { bulan: 'Mar', suhu: 27.10, stasiun: 116 },
+            { bulan: 'Apr', suhu: 27.50, stasiun: 116 },
+            { bulan: 'Mei', suhu: 27.50, stasiun: 105 },
+            { bulan: 'Jun', suhu: 27.30, stasiun: null },
+            { bulan: 'Jul', suhu: 27.00, stasiun: 109 },
+            { bulan: 'Agt', suhu: 27.22, stasiun: 103 },
+            { bulan: 'Sep', suhu: 27.58, stasiun: 98 },
+            { bulan: 'Okt', suhu: 27.65, stasiun: 101 }
+        ];
+
+        // 3. Data Karhutla Nasional & Provinsi 2018-2026 (luas-karhutla-provinsi.xlsx)
+        const karhutlaNasional = [
+            { year: 2018, luas: 529266.64, anomali: 0.870, predMulti: 0.9487 },
+            { year: 2019, luas: 1649258.00, anomali: 1.033, predMulti: 1.0139 },
+            { year: 2020, luas: 296942.00, anomali: 1.225, predMulti: 1.0250 },
+            { year: 2021, luas: 358867.00, anomali: 1.007, predMulti: 1.0671 },
+            { year: 2022, luas: 204894.00, anomali: 0.970, predMulti: 1.1044 },
+            { year: 2023, luas: 1161192.90, anomali: 1.093, predMulti: 1.1660 },
+            { year: 2024, luas: 376805.05, anomali: 1.419, predMulti: 1.1896 },
+            { year: 2025, luas: 12226.72, anomali: 1.121, predMulti: 1.2223 },
+            { year: 2026, luas: 202010.96, anomali: null, predMulti: 1.2673 }
+        ];
+
+        const dataProvinsi = [
+            { prov: "Kalimantan Barat", y2019: 151919.00, y2023: 111848.43, y2024: 24154.63, y2025: 1209.06, y2026: 38310.86 },
+            { prov: "Papua Selatan", y2019: 0.00, y2023: 150813.34, y2024: 27182.19, y2025: 32.00, y2026: 25838.53 },
+            { prov: "Nusa Tenggara Timur", y2019: 136920.00, y2023: 102536.89, y2024: 113089.51, y2025: 1493.02, y2026: 19565.16 },
+            { prov: "Nusa Tenggara Barat", y2019: 60234.00, y2023: 66716.43, y2024: 46189.73, y2025: 1867.35, y2026: 17406.46 },
+            { prov: "Riau", y2019: 90550.00, y2023: 7267.03, y2024: 11027.96, y2025: 751.08, y2026: 15738.92 },
+            { prov: "Maluku", y2019: 27211.00, y2023: 45999.39, y2024: 13404.83, y2025: 421.53, y2026: 14677.00 },
+            { prov: "Jawa Timur", y2019: 23655.00, y2023: 49498.32, y2024: 20957.17, y2025: 233.97, y2026: 10835.28 },
+            { prov: "Kalimantan Selatan", y2019: 137848.00, y2023: 190394.58, y2024: 4993.88, y2025: 24.35, y2026: 8019.63 },
+            { prov: "Kalimantan Tengah", y2019: 317749.00, y2023: 165896.44, y2024: 11459.89, y2025: 149.06, y2026: 7634.46 },
+            { prov: "Kepulauan Riau", y2019: 6134.00, y2023: 724.26, y2024: 1498.66, y2025: 141.65, y2026: 5760.90 },
+            { prov: "Lampung", y2019: 35546.00, y2023: 6506.67, y2024: 13242.01, y2025: 514.73, y2026: 4890.26 },
+            { prov: "Aceh", y2019: 730.00, y2023: 1936.86, y2024: 7257.35, y2025: 355.01, y2026: 4070.48 },
+            { prov: "Sulawesi Tengah", y2019: 11551.00, y2023: 10844.28, y2024: 4920.70, y2025: 312.15, y2026: 3138.10 },
+            { prov: "Sulawesi Tenggara", y2019: 16929.00, y2023: 18736.47, y2024: 1629.74, y2025: 100.01, y2026: 2735.48 },
+            { prov: "Kalimantan Timur", y2019: 68524.00, y2023: 39494.41, y2024: 22570.50, y2025: 342.95, y2026: 2715.76 },
+            { prov: "Papua Tengah", y2019: 0.00, y2023: 2593.91, y2024: 104.02, y2025: 89.01, y2026: 2519.88 },
+            { prov: "Papua Barat", y2019: 1533.00, y2023: 259.03, y2024: 198.85, y2025: 203.38, y2026: 2496.39 },
+            { prov: "Sumatera Selatan", y2019: 336798.00, y2023: 132082.86, y2024: 15422.48, y2025: 43.08, y2026: 1926.23 },
+            { prov: "Jawa Barat", y2019: 9552.00, y2023: 11524.80, y2024: 4548.58, y2025: 0.65, y2026: 1892.97 },
+            { prov: "Papua Pegunungan", y2019: 0.00, y2023: 787.11, y2024: 461.56, y2025: 73.42, y2026: 1681.43 },
+            { prov: "Sumatera Barat", y2019: 2133.00, y2023: 4885.13, y2024: 3052.20, y2025: 514.48, y2026: 1491.07 },
+            { prov: "Sulawesi Selatan", y2019: 15697.00, y2023: 6489.26, y2024: 3522.91, y2025: 474.91, y2026: 1489.50 },
+            { prov: "Sumatera Utara", y2019: 2514.00, y2023: 2113.75, y2024: 7032.27, y2025: 361.16, y2026: 1330.00 },
+            { prov: "Jawa Tengah", y2019: 4782.00, y2023: 9965.59, y2024: 3726.78, y2025: 1372.29, y2026: 947.97 },
+            { prov: "Sulawesi Barat", y2019: 3029.00, y2023: 2132.31, y2024: 994.74, y2025: 172.29, y2026: 865.60 },
+            { prov: "Papua Barat Daya", y2019: 0.00, y2023: 504.24, y2024: 28.42, y2025: 189.12, y2026: 716.70 },
+            { prov: "Maluku Utara", y2019: 2781.00, y2023: 542.18, y2024: 102.57, y2025: 27.53, y2026: 589.64 },
+            { prov: "Papua", y2019: 108110.00, y2023: 604.01, y2024: 544.19, y2025: 63.33, y2026: 544.61 },
+            { prov: "Gorontalo", y2019: 1909.00, y2023: 666.33, y2024: 767.03, y2025: 89.86, y2026: 455.95 },
+            { prov: "Kalimantan Utara", y2019: 8559.00, y2023: 796.36, y2024: 2429.21, y2025: 80.95, y2026: 400.62 },
+            { prov: "Jambi", y2019: 56593.00, y2023: 6539.68, y2024: 5636.69, y2025: 46.79, y2026: 379.00 },
+            { prov: "Sulawesi Utara", y2019: 4574.00, y2023: 2531.44, y2024: 651.68, y2025: 6.51, y2026: 368.78 },
+            { prov: "Bangka Belitung", y2019: 4778.00, y2023: 4752.98, y2024: 2915.46, y2025: 214.71, y2026: 335.63 },
+            { prov: "Bengkulu", y2019: 11.00, y2023: 75.94, y2024: 355.05, y2025: 157.81, y2026: 125.15 },
+            { prov: "Bali", y2019: 373.00, y2023: 2011.27, y2024: 316.36, y2025: 93.08, y2026: 108.28 },
+            { prov: "Banten", y2019: 9.00, y2023: 1.01, y2024: 362.83, y2025: 4.44, y2026: 8.28 },
+            { prov: "DKI Jakarta", y2019: 0.00, y2023: 0.00, y2024: 0.51, y2025: 0.00, y2026: 0.00 },
+            { prov: "Yogyakarta", y2019: 23.00, y2023: 119.91, y2024: 51.91, y2025: 0.00, y2026: 0.00 }
+        ];
+
+        // ==================== KONFIGURASI CHART.JS GLOBAL ====================
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = 'Inter, sans-serif';
+
+        let chartHistInstance = null;
+        let chartBulananInstance = null;
+        let chartRegMultiInstance = null;
+        let chartRegHistInstance = null;
+        let chartProvInstance = null;
+        let chartNasInstance = null;
+
+        // 1. Render Grafik Historis 1965-2025
+        function updateHistChart(mode) {
+            const btnAll = document.getElementById('hist-all');
+            const btn5yr = document.getElementById('hist-5yr');
+            if (mode === 'all') {
+                btnAll.className = 'px-2.5 py-1 rounded-lg text-xs font-medium bg-orange-500 text-white cursor-pointer';
+                btn5yr.className = 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-300 hover:text-white cursor-pointer';
+            } else {
+                btn5yr.className = 'px-2.5 py-1 rounded-lg text-xs font-medium bg-orange-500 text-white cursor-pointer';
+                btnAll.className = 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-300 hover:text-white cursor-pointer';
+            }
+
+            const filtered = mode === '5yr'
+                ? dataHistoris.filter(d => d.year % 5 === 0)
+                : dataHistoris;
+
+            const labels = filtered.map(d => d.year);
+            const values = filtered.map(d => d.val);
+            const colors = values.map(v => v < 0 ? 'rgba(59, 130, 246, 0.8)' : (v >= 1.0 ? 'rgba(239, 68, 68, 0.85)' : 'rgba(249, 115, 22, 0.8)'));
+
+            if (chartHistInstance) chartHistInstance.destroy();
+            const ctx = document.getElementById('chartHistoris').getContext('2d');
+            chartHistInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Anomali Suhu (°C)',
+                        data: values,
+                        backgroundColor: colors,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `Anomali: ${ctx.parsed.y >= 0 ? '+' : ''}${ctx.parsed.y.toFixed(3)} °C`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: {
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' },
+                            title: { display: true, text: 'Anomali Suhu (°C)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. Render Grafik Suhu Bulanan 2026 + Proyeksi Nov-Des
+        function initBulananChart() {
+            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov (Pred)', 'Des (Pred)'];
+            const aktual = [26.70, 26.70, 27.10, 27.50, 27.50, 27.30, 27.00, 27.22, 27.58, 27.65, null, null];
+            const proyeksi = [null, null, null, null, null, null, null, null, null, 27.60, 27.68, 27.76];
+            const garisTren = labels.map((_, idx) => +(26.7713 + 0.0825 * (idx + 1)).toFixed(2));
+
+            const ctx = document.getElementById('chartBulanan2026').getContext('2d');
+            chartBulananInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Observasi BMKG (°C)',
+                            data: aktual,
+                            borderColor: '#38bdf8',
+                            backgroundColor: 'rgba(56, 189, 248, 0.2)',
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            tension: 0.25
+                        },
+                        {
+                            label: 'Proyeksi Akhir Tahun (°C)',
+                            data: proyeksi,
+                            borderColor: '#10b981',
+                            backgroundColor: '#10b981',
+                            borderDash: [5, 5],
+                            borderWidth: 3,
+                            pointRadius: 6,
+                            pointStyle: 'rectRot'
+                        },
+                        {
+                            label: 'Garis Tren Regresi',
+                            data: garisTren,
+                            borderColor: 'rgba(249, 115, 22, 0.7)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            borderDash: [3, 3]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: {
+                            min: 26.5,
+                            max: 27.9,
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' },
+                            title: { display: true, text: 'Suhu Rata-Rata (°C)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 3. Render Grafik Regresi Berganda (Tab Model Regresi)
+        function initRegresiCharts() {
+            // Chart Regresi Berganda (2018-2026)
+            const ctxMulti = document.getElementById('chartRegresiBerganda').getContext('2d');
+            chartRegMultiInstance = new Chart(ctxMulti, {
+                type: 'line',
+                data: {
+                    labels: karhutlaNasional.map(d => d.year),
+                    datasets: [
+                        {
+                            label: 'Anomali Aktual (2018–2025)',
+                            data: karhutlaNasional.map(d => d.anomali),
+                            borderColor: '#38bdf8',
+                            backgroundColor: '#38bdf8',
+                            borderWidth: 2.5,
+                            pointRadius: 4,
+                            tension: 0.15
+                        },
+                        {
+                            label: 'Estimasi Regresi (Tahun + Karhutla)',
+                            data: karhutlaNasional.map(d => d.predMulti),
+                            borderColor: '#f97316',
+                            backgroundColor: '#f97316',
+                            borderDash: [6, 4],
+                            borderWidth: 2.5,
+                            pointRadius: karhutlaNasional.map(d => d.year === 2026 ? 8 : 4),
+                            pointBackgroundColor: karhutlaNasional.map(d => d.year === 2026 ? '#10b981' : '#f97316'),
+                            pointBorderColor: karhutlaNasional.map(d => d.year === 2026 ? '#ffffff' : '#f97316'),
+                            pointBorderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(ctx) {
+                                    const item = karhutlaNasional[ctx.dataIndex];
+                                    return `Luas Karhutla: ${item.luas.toLocaleString('id-ID')} Ha`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: {
+                            min: 0.8,
+                            max: 1.5,
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' },
+                            title: { display: true, text: 'Anomali Suhu (°C)' }
+                        }
+                    }
+                }
+            });
+
+            // Chart Regresi Historis 1965-2026 + Validasi Riil
+            const years62 = [...dataHistoris.map(d => d.year), 2026];
+            const scatterHist = [...dataHistoris.map(d => d.val), null];
+            const trendLine = years62.map(y => +(-39.6888 + 0.0201 * y).toFixed(4));
+            const pred2026Point = years62.map(y => y === 2026 ? 1.0453 : null);
+            const obs2026Point = years62.map(y => y === 2026 ? 1.0250 : null);
+
+            const ctxHist = document.getElementById('chartRegresiHistoris').getContext('2d');
+            chartRegHistInstance = new Chart(ctxHist, {
+                type: 'line',
+                data: {
+                    labels: years62,
+                    datasets: [
+                        {
+                            label: 'Observasi Historis (1965–2025)',
+                            data: scatterHist,
+                            borderColor: 'transparent',
+                            backgroundColor: 'rgba(96, 165, 250, 0.75)',
+                            pointRadius: 3.5,
+                            showLine: false
+                        },
+                        {
+                            label: 'Garis Tren (Y = -39,69 + 0,0201X)',
+                            data: trendLine,
+                            borderColor: '#ef4444',
+                            borderWidth: 2.5,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Prediksi 2026 (+1,0453 °C)',
+                            data: pred2026Point,
+                            backgroundColor: '#f97316',
+                            borderColor: '#ffffff',
+                            borderWidth: 2,
+                            pointRadius: 7,
+                            pointStyle: 'rectRot',
+                            showLine: false
+                        },
+                        {
+                            label: 'Fakta Riil 2026 (+1,0250 °C)',
+                            data: obs2026Point,
+                            backgroundColor: '#10b981',
+                            borderColor: '#ffffff',
+                            borderWidth: 2,
+                            pointRadius: 7,
+                            showLine: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: {
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' },
+                            title: { display: true, text: 'Anomali Suhu (°C)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 4. Render Grafik & Tabel Provinsi
+        function renderProvinsiChart() {
+            const yr = document.getElementById('selectTahunProvinsi').value;
+            const keyMap = { '2026': 'y2026', '2025': 'y2025', '2024': 'y2024', '2023': 'y2023', '2019': 'y2019' };
+            const field = keyMap[yr];
+
+            const sorted = [...dataProvinsi].sort((a, b) => b[field] - a[field]).slice(0, 10);
+
+            if (chartProvInstance) chartProvInstance.destroy();
+            const ctx = document.getElementById('chartProvinsi').getContext('2d');
+            chartProvInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sorted.map(d => d.prov),
+                    datasets: [{
+                        label: `Luas Terbakar ${yr} (Ha)`,
+                        data: sorted.map(d => d[field]),
+                        backgroundColor: 'rgba(249, 115, 22, 0.85)',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `${ctx.parsed.x.toLocaleString('id-ID', { minimumFractionDigits: 2 })} Hektare`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { color: 'rgba(148, 163, 184, 0.1)' } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function initNasionalKarhutlaChart() {
+            const ctx = document.getElementById('chartNasionalKarhutla').getContext('2d');
+            chartNasInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: karhutlaNasional.map(d => d.year),
+                    datasets: [{
+                        label: 'Total Luas Karhutla (Ha)',
+                        data: karhutlaNasional.map(d => d.luas),
+                        backgroundColor: karhutlaNasional.map(d => d.year === 2026 ? '#10b981' : 'rgba(56, 189, 248, 0.7)'),
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `${ctx.parsed.y.toLocaleString('id-ID')} Ha`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: { color: 'rgba(148, 163, 184, 0.1)' } }
+                    }
+                }
+            });
+        }
+
+        function filterTabelProvinsi() {
+            const q = document.getElementById('searchProvinsi').value.toLowerCase();
+            const tbody = document.getElementById('tbodyProvinsi');
+            const filtered = dataProvinsi.filter(d => d.prov.toLowerCase().includes(q));
+
+            tbody.innerHTML = filtered.map(d => `
+                <tr class="hover:bg-slate-800/50 transition-colors">
+                    <td class="py-2.5 px-3 font-medium text-white">${d.prov}</td>
+                    <td class="py-2.5 px-3 text-right text-slate-300">${d.y2019.toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
+                    <td class="py-2.5 px-3 text-right text-slate-300">${d.y2023.toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
+                    <td class="py-2.5 px-3 text-right text-slate-300">${d.y2024.toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
+                    <td class="py-2.5 px-3 text-right text-slate-300">${d.y2025.toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
+                    <td class="py-2.5 px-3 text-right font-bold text-orange-400">${d.y2026.toLocaleString('id-ID', { minimumFractionDigits: 2 })}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ==================== LOGIKA SIMULATOR REGRESI BERGANDA ====================
+        function hitungSimulasi() {
+            const tahun = parseInt(document.getElementById('simTahun').value, 10);
+            const luas = parseFloat(document.getElementById('simLuas').value);
+
+            document.getElementById('valTahun').textContent = tahun;
+            document.getElementById('valLuas').textContent = `${luas.toLocaleString('id-ID')} Ha`;
+
+            // Koefisien eksak dari model scikit-learn:
+            // Intercept = -81.197386, Coef Year = 0.040701, Coef Luas = 0.0000000219
+            const intercept = -81.197386;
+            const b1 = 0.040701;
+            const b2 = 0.0000000219;
+
+            const efekWaktu = intercept + (b1 * tahun);
+            const efekKarhutla = b2 * luas;
+            const prediksi = efekWaktu + efekKarhutla;
+            const suhuMutlak = 26.20 + prediksi;
+
+            document.getElementById('hasilSimulasi').textContent = `${prediksi >= 0 ? '+' : ''}${prediksi.toFixed(4)} °C`;
+            document.getElementById('estimasiSuhuMutlak').innerHTML = `Setara suhu rata-rata nasional <strong class="text-white">${suhuMutlak.toFixed(2)} °C</strong> (di atas baseline 26,20 °C)`;
+            document.getElementById('efekWaktu').textContent = `${efekWaktu >= 0 ? '+' : ''}${efekWaktu.toFixed(4)} °C`;
+            document.getElementById('efekKarhutla').textContent = `+${efekKarhutla.toFixed(4)} °C`;
+            document.getElementById('rumusLive').textContent =
+                `Y = -81,1974 + (0,040701 × ${tahun}) + (0,0000000219 × ${luas}) = ${prediksi >= 0 ? '+' : ''}${prediksi.toFixed(4)} °C`;
+        }
+
+        function setSkenario(tahun, luas) {
+            document.getElementById('simTahun').value = tahun;
+            document.getElementById('simLuas').value = luas;
+            hitungSimulasi();
+        }
+
+        function resetSimulator() {
+            setSkenario(2026, 202011);
+        }
+
+        // ==================== NAVIGASI TAB ====================
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('text-slate-300', 'hover:text-white', 'hover:bg-slate-800/70');
+            });
+
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            activeBtn.classList.add('tab-active');
+            activeBtn.classList.remove('text-slate-300', 'hover:text-white', 'hover:bg-slate-800/70');
+        }
+
+        // Inisialisasi saat halaman dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            updateHistChart('all');
+            initBulananChart();
+            initRegresiCharts();
+            renderProvinsiChart();
+            initNasionalKarhutlaChart();
+            filterTabelProvinsi();
+            hitungSimulasi();
+        });
+    </script>
+</body>
+</html>
